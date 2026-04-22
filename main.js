@@ -534,110 +534,69 @@ const btnContent = document.getElementById('btnContent');
 const statusMessage = document.getElementById('statusMessage');
 
 const EMAIL_ENDPOINT = 'https://formsubmit.co/ajax/davidakandwanaho2010@gmail.com';
-const SMS_WEBHOOK_URL = 'YOUR_MAKECOM_WEBHOOK_URL_HERE';
 
 function showStatus(message, type) {
-statusMessage.classList.remove('hidden', 'bg-green-500/20', 'text-green-400', 'border', 'border-green-500/30', 'bg-red-500/20', 'text-red-400', 'border-red-500/30', 'bg-yellow-500/20', 'text-yellow-400', 'border-yellow-500/30');
-
-if (type === 'success') {
-    statusMessage.classList.add('bg-green-500/20', 'text-green-400', 'border', 'border-green-500/30');
-} else if (type === 'error') {
-    statusMessage.classList.add('bg-red-500/20', 'text-red-400', 'border', 'border-red-500/30');
-} else {
-    statusMessage.classList.add('bg-yellow-500/20', 'text-yellow-400', 'border', 'border-yellow-500/30');
-}
-
-statusMessage.textContent = message;
-statusMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  statusMessage.classList.remove('hidden', 'bg-green-500/20', 'text-green-400', 'border', 'border-green-500/30', 'bg-red-500/20', 'text-red-400', 'border-red-500/30', 'bg-yellow-500/20', 'text-yellow-400', 'border-yellow-500/30');
+  const colorMap = { success: 'green', error: 'red', warning: 'yellow' };
+  const c = colorMap[type] || 'yellow';
+  statusMessage.classList.add(`bg-${c}-500/20`, `text-${c}-400`, 'border', `border-${c}-500/30`);
+  statusMessage.textContent = message;
+  statusMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function setLoading(loading) {
-if (loading) {
-    submitBtn.disabled = true;
-    btnContent.innerHTML = '<div class="spinner"></div><span class="ml-2">Processing...</span>';
-} else {
-    submitBtn.disabled = false;
-    btnContent.innerHTML = 'Submit Registration<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>';
-}
+  submitBtn.disabled = loading;
+  btnContent.innerHTML = loading 
+    ? '<div class="spinner"></div><span class="ml-2">Processing...</span>'
+    : 'Submit Registration <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>';
 }
 
 async function sendEmail(data) {
-const formData = new URLSearchParams();
-formData.append('_subject', 'New Registration - Inter Schools Coding Competition');
-formData.append('_template', 'table');
-formData.append('_captcha', 'false');
-formData.append('Full Name', data.fullname);
-formData.append('Preferred Username', data.username);
-formData.append('Gmail', data.gmail);
-formData.append('Phone Number', data.tel);
+  const formData = new URLSearchParams();
+  formData.append('_subject', 'New Registration - Inter Schools Coding Competition');
+  formData.append('_template', 'table');
+  formData.append('_captcha', 'false');
+  formData.append('Full Name', data.fullname);
+  formData.append('Preferred Username', data.username);
+  formData.append('Gmail', data.gmail);
+  formData.append('Phone Number', data.tel);
 
-const response = await fetch(EMAIL_ENDPOINT, {
+  const res = await fetch(EMAIL_ENDPOINT, {
     method: 'POST',
-    headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Accept': 'application/json'
-    },
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
     body: formData
-});
+  });
 
-if (!response.ok) {
-    throw new Error(`Email failed with status: ${response.status}`);
-}
-
-return await response.json();
-}
-
-async function sendSMSFallback(data) {
-if (SMS_WEBHOOK_URL === 'YOUR_MAKECOM_WEBHOOK_URL_HERE') {
-    throw new Error('SMS Webhook URL not configured');
-}
-
-const smsPayload = {
-    to: '+256 758607511',
-    message: `NEW REGISTRATION FAILED:\nName: ${data.fullname}\nUsername: ${data.username}\nEmail: ${data.gmail}\nPhone: ${data.tel}\n\nEmail delivery failed. Please process manually.`,
-    source: 'coding-competition-form',
-    timestamp: new Date().toISOString()
-};
-
-const response = await fetch(SMS_WEBHOOK_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(smsPayload)
-});
-
-if (!response.ok) {
-    throw new Error(`SMS fallback failed with status: ${response.status}`);
-}
-
-return await response.json();
+  const result = await res.json();
+  
+  // FormSubmit returns 200 even on errors, so we MUST check result.success
+  if (!res.ok || !result.success) {
+    throw new Error(result.message || `Server responded with ${res.status}`);
+  }
+  
+  return result;
 }
 
 form.addEventListener('submit', async function(e) {
-e.preventDefault();
-setLoading(true);
-showStatus('Sending registration...', 'warning');
+  e.preventDefault();
+  setLoading(true);
+  showStatus('⏳ Sending registration...', 'warning');
 
-const formData = {
+  const formData = {
     fullname: document.getElementById('fullname').value.trim(),
     username: document.getElementById('username').value.trim(),
     gmail: document.getElementById('gmail').value.trim(),
     tel: document.getElementById('tel').value.trim()
-};
+  };
 
-try {
+  try {
     await sendEmail(formData);
-    showStatus('✅ Registration submitted successfully! Email sent.', 'success');
+    showStatus('✅ Registration submitted successfully! Check your email for confirmation.', 'success');
     form.reset();
-} catch (emailError) {
-    showStatus(`⚠️ Email delivery failed. Attempting SMS fallback...`, 'warning');
-    try {
-        await sendSMSFallback(formData);
-        showStatus('✅ Email failed but SMS alert sent successfully!', 'success');
-        form.reset();
-    } catch (smsError) {
-        showStatus(`❌ Both delivery methods failed. Please contact us directly.`, 'error');
-    }
-} finally {
+  } catch (err) {
+    console.error('FormSubmit Error:', err.message);
+    showStatus(`❌ Failed: ${err.message}. Check spam for activation email.`, 'error');
+  } finally {
     setLoading(false);
-}
+  }
 });
