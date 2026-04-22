@@ -1,26 +1,27 @@
-// Animation Controls
+
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>
+                body {
+                  background-color: white; /* Ensure the iframe has a white background */
+                }
+
+                
+              </style>
+                        </head>
+                        <body>
+                            
+
+              <script>
+                              // Animation Controls
 let animationRunning = true;
 let animationSpeed = 1;
 let lastTime = 0;
 
-document.getElementById('toggleAnimation').addEventListener('click', function() {
-animationRunning = !animationRunning;
-document.getElementById('pauseIcon').classList.toggle('hidden', !animationRunning);
-document.getElementById('playIcon').classList.toggle('hidden', animationRunning);
-document.getElementById('toggleText').textContent = animationRunning ? 'Pause' : 'Play';
-});
-
-document.getElementById('speedControl').addEventListener('input', function(e) {
-animationSpeed = parseFloat(e.target.value);
-document.getElementById('speedValue').textContent = animationSpeed + 'x';
-});
-
 // Enhanced Code Matrix Animation with Syntax Highlighting
-const canvas = document.getElementById('codeMatrix');
-const ctx = canvas.getContext('2d');
-
-let width, height, columns, drops;
-
 // Real Python and JavaScript code snippets
 const codeSnippets = [
 // Python - DFS Algorithm
@@ -264,25 +265,57 @@ boolean: '#bd93f9',      // Purple - True/False
 default: '#f8f8f2'       // White - default
 };
 
-function resizeCanvas() {
-width = canvas.width = window.innerWidth;
-height = canvas.height = window.innerHeight;
-columns = Math.floor(width / 12);
-drops = [];
-for (let i = 0; i < columns; i++) {
-    drops[i] = {
-        y: Math.random() * -100,
-        speed: Math.random() * 0.6 + 0.3, // Slower base speed
-        snippetIndex: Math.floor(Math.random() * codeSnippets.length),
-        lineIndex: 0,
-        opacity: Math.random() * 0.4 + 0.6,
-        fontSize: Math.floor(Math.random() * 3) + 12
-    };
-}
+// Helper Functions
+function escapeHtml(text) {
+const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+};
+return text.replace(/[&<>"']/g, m => map[m]);
 }
 
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
+function isKeyword(word) {
+return ['def', 'class', 'if', 'for', 'while', 'return', 'import', 'from', 'else', 'elif', 
+        'try', 'catch', 'throw', 'new', 'const', 'let', 'var', 'function', 'async', 'await',
+        'yield', 'with', 'as', 'in', 'not', 'and', 'or', 'is', 'True', 'False', 'None',
+        'export', 'default', 'typeof', 'instanceof', 'switch', 'case', 'break', 'continue',
+        'do', 'finally', 'this', 'super', 'extends', 'implements', 'interface', 'type'].includes(word);
+}
+
+function isFunction(word, line, pos) {
+// Check if followed by ( - indicates function call
+const trimmed = line.substring(pos).trim();
+return trimmed.startsWith('(') || word === 'def' || word === 'function';
+}
+
+function isBuiltin(word) {
+return ['print', 'input', 'int', 'str', 'float', 'len', 'range', 'list', 'dict', 'set',
+        'tuple', 'bool', 'type', 'isinstance', 'enumerate', 'zip', 'map', 'filter', 'sorted',
+        'open', 'len', 'append', 'extend', 'pop', 'remove', 'clear', 'copy', 'count',
+        'index', 'insert', 'reverse', 'sort', 'join', 'split', 'strip', 'replace',
+        'fetch', 'console', 'log', 'error', 'warn', 'info', 'setTimeout', 'clearTimeout',
+        'setInterval', 'clearInterval', 'Promise', 'JSON', 'parse', 'stringify', 'Math',
+        'floor', 'ceil', 'round', 'random', 'sqrt', 'pow', 'abs', 'max', 'min',
+        'Array', 'Object', 'String', 'Number', 'Date', 'RegExp', 'Error', 'Map', 'Set',
+        'WeakMap', 'WeakSet', 'Symbol', 'Proxy', 'Reflect', 'apply', 'call', 'bind',
+        'addEventListener', 'getElementById', 'querySelector', 'querySelectorAll',
+        'createElement', 'appendChild', 'removeChild', 'setAttribute', 'getAttribute',
+        'addEventListener', 'removeEventListener', 'preventDefault', 'stopPropagation'].includes(word);
+}
+
+function isType(word) {
+return ['List', 'Dict', 'Set', 'Tuple', 'Optional', 'Union', 'Any', 'Callable',
+        'Iterable', 'Iterator', 'Generator', 'Sequence', 'Mapping', 'MutableMapping',
+        'int', 'float', 'str', 'bool', 'bytes', 'bytearray', 'complex', 'frozenset',
+        'UserDict', 'UserList', 'UserString'].includes(word) || /^[A-Z]/.test(word);
+}
+
+function isBoolean(word) {
+return ['True', 'False', 'None', 'null', 'undefined', 'NaN', 'Infinity'].includes(word);
+}
 
 function highlightLine(line) {
 let html = '';
@@ -371,232 +404,289 @@ while (i < line.length) {
 return html;
 }
 
-function escapeHtml(text) {
-const map = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;'
-};
-return text.replace(/[&<>"']/g, m => map[m]);
-}
+// Main execution wrapped in DOMContentLoaded to handle script in <head> safely
+document.addEventListener('DOMContentLoaded', () => {
+    // Animation Controls
+    const toggleBtn = document.getElementById('toggleAnimation');
+    const pauseIcon = document.getElementById('pauseIcon');
+    const playIcon = document.getElementById('playIcon');
+    const toggleText = document.getElementById('toggleText');
+    const speedControl = document.getElementById('speedControl');
+    const speedValue = document.getElementById('speedValue');
 
-function isKeyword(word) {
-return ['def', 'class', 'if', 'for', 'while', 'return', 'import', 'from', 'else', 'elif', 
-        'try', 'catch', 'throw', 'new', 'const', 'let', 'var', 'function', 'async', 'await',
-        'yield', 'with', 'as', 'in', 'not', 'and', 'or', 'is', 'True', 'False', 'None',
-        'export', 'default', 'typeof', 'instanceof', 'switch', 'case', 'break', 'continue',
-        'do', 'finally', 'this', 'super', 'extends', 'implements', 'interface', 'type'].includes(word);
-}
-
-function isFunction(word, line, pos) {
-// Check if followed by ( - indicates function call
-const trimmed = line.substring(pos).trim();
-return trimmed.startsWith('(') || word === 'def' || word === 'function';
-}
-
-function isBuiltin(word) {
-return ['print', 'input', 'int', 'str', 'float', 'len', 'range', 'list', 'dict', 'set',
-        'tuple', 'bool', 'type', 'isinstance', 'enumerate', 'zip', 'map', 'filter', 'sorted',
-        'open', 'len', 'append', 'extend', 'pop', 'remove', 'clear', 'copy', 'count',
-        'index', 'insert', 'reverse', 'sort', 'join', 'split', 'strip', 'replace',
-        'fetch', 'console', 'log', 'error', 'warn', 'info', 'setTimeout', 'clearTimeout',
-        'setInterval', 'clearInterval', 'Promise', 'JSON', 'parse', 'stringify', 'Math',
-        'floor', 'ceil', 'round', 'random', 'sqrt', 'pow', 'abs', 'max', 'min',
-        'Array', 'Object', 'String', 'Number', 'Date', 'RegExp', 'Error', 'Map', 'Set',
-        'WeakMap', 'WeakSet', 'Symbol', 'Proxy', 'Reflect', 'apply', 'call', 'bind',
-        'addEventListener', 'getElementById', 'querySelector', 'querySelectorAll',
-        'createElement', 'appendChild', 'removeChild', 'setAttribute', 'getAttribute',
-        'addEventListener', 'removeEventListener', 'preventDefault', 'stopPropagation'].includes(word);
-}
-
-function isType(word) {
-return ['List', 'Dict', 'Set', 'Tuple', 'Optional', 'Union', 'Any', 'Callable',
-        'Iterable', 'Iterator', 'Generator', 'Sequence', 'Mapping', 'MutableMapping',
-        'int', 'float', 'str', 'bool', 'bytes', 'bytearray', 'complex', 'frozenset',
-        'UserDict', 'UserList', 'UserString'].includes(word) || /^[A-Z]/.test(word);
-}
-
-function isBoolean(word) {
-return ['True', 'False', 'None', 'null', 'undefined', 'NaN', 'Infinity'].includes(word);
-}
-
-function draw() {
-requestAnimationFrame(draw);
-
-if (!animationRunning) return;
-
-// Fade effect for trails
-ctx.fillStyle = 'rgba(3, 7, 18, 0.15)';
-ctx.fillRect(0, 0, width, height);
-
-for (let i = 0; i < columns; i++) {
-    const drop = drops[i];
-    const snippet = codeSnippets[drop.snippetIndex];
-    const line = snippet[drop.lineIndex] || '';
-    
-    const x = i * 12;
-    const y = drop.y * 18;
-    
-    // Skip empty lines
-    if (!line.trim()) {
-        drop.y += drop.speed * animationSpeed * 0.5;
-        if (drop.y * 18 > height) {
-            resetDrop(drop);
-        }
-        continue;
-    }
-    
-    ctx.font = `${drop.fontSize}px monospace`;
-    
-    // Highlight and draw
-    const highlighted = highlightLine(line);
-    
-    // Use canvas text drawing with colors
-    let currentX = x;
-    let tempI = 0;
-    let color = syntaxColors.default;
-    let inSpan = false;
-    let inComment = false;
-    
-    // Check for comments
-    if (line.trim().startsWith('#') || line.trim().startsWith('//')) {
-        ctx.fillStyle = syntaxColors.comment;
-        ctx.fillText(line, x, y);
-    } else {
-        // Simple highlighting without full HTML parsing for performance
-        let finalColor = syntaxColors.default;
-        
-        // Check if it's a string line
-        const hasString = (line.includes("'") || line.includes('"'));
-        const hasKeyword = line.split(/\s+/).some(w => isKeyword(w.replace(/[(){},;:]/g, '')));
-        const hasFunction = line.includes('(');
-        
-        if (hasString) finalColor = syntaxColors.string;
-        else if (hasKeyword && hasFunction) finalColor = syntaxColors.keyword;
-        else if (hasKeyword) finalColor = syntaxColors.keyword;
-        else if (hasFunction) finalColor = syntaxColors.function;
-        else if (/\d/.test(line) && !/[a-zA-Z]/.test(line.trim())) finalColor = syntaxColors.number;
-        else if (line.trim().startsWith('import ') || line.trim().startsWith('from ')) finalColor = syntaxColors.keyword;
-        else if (line.includes('=>')) finalColor = syntaxColors.operator;
-        else if (line.includes('def ') || line.includes('function ')) finalColor = syntaxColors.keyword;
-        else if (line.includes('class ')) finalColor = syntaxColors.keyword;
-        else if (line.includes('@')) finalColor = syntaxColors.decorator;
-        else if (line.trim().startsWith('return ') || line.trim().startsWith('yield ')) finalColor = syntaxColors.keyword;
-        else if (line.includes('async ') || line.includes('await ')) finalColor = syntaxColors.keyword;
-        else if (line.includes('try') || line.includes('catch') || line.includes('finally')) finalColor = syntaxColors.keyword;
-        else if (line.includes('if ') || line.includes('for ') || line.includes('while ')) finalColor = syntaxColors.keyword;
-        
-        // Apply color with glow for bright text
-        ctx.fillStyle = finalColor;
-        ctx.shadowBlur = line.trim() ? 8 : 0;
-        ctx.shadowColor = finalColor;
-        ctx.fillText(line, x, y);
-        ctx.shadowBlur = 0;
-        
-        // Head of trail (bright white)
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        ctx.fillText(line.substring(0, 8), x, y);
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', function() {
+            animationRunning = !animationRunning;
+            pauseIcon.classList.toggle('hidden', !animationRunning);
+            playIcon.classList.toggle('hidden', animationRunning);
+            toggleText.textContent = animationRunning ? 'Pause' : 'Play';
+        });
     }
 
-    // Move drop down
-    drop.y += drop.speed * animationSpeed;
-    
-    // Advance to next line in snippet
-    if (drop.y * 18 > height || Math.floor(drop.y) > snippet.length) {
-        drop.lineIndex = (drop.lineIndex + 1) % snippet.length;
-        if (drop.lineIndex === 0) {
-            // Switch to new snippet when we cycle through
-            drop.snippetIndex = Math.floor(Math.random() * codeSnippets.length);
+    if (speedControl) {
+        speedControl.addEventListener('input', function(e) {
+            animationSpeed = parseFloat(e.target.value);
+            speedValue.textContent = animationSpeed + 'x';
+        });
+    }
+
+    // Canvas Setup
+    const canvas = document.getElementById('codeMatrix');
+    if (!canvas) return; // Guard clause if canvas not found
+    const ctx = canvas.getContext('2d');
+
+    let width, height, columns, drops;
+
+    function resizeCanvas() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+        columns = Math.floor(width / 12);
+        drops = [];
+        for (let i = 0; i < columns; i++) {
+            drops[i] = {
+                y: Math.random() * -100,
+                speed: Math.random() * 0.6 + 0.3,
+                snippetIndex: Math.floor(Math.random() * codeSnippets.length),
+                lineIndex: 0,
+                opacity: Math.random() * 0.4 + 0.6,
+                fontSize: Math.floor(Math.random() * 3) + 12
+            };
         }
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function resetDrop(drop) {
         drop.y = 0;
+        drop.snippetIndex = Math.floor(Math.random() * codeSnippets.length);
+        drop.lineIndex = 0;
         drop.speed = Math.random() * 0.6 + 0.3;
         drop.fontSize = Math.floor(Math.random() * 3) + 12;
     }
-}
-}
 
-function resetDrop(drop) {
-drop.y = 0;
-drop.snippetIndex = Math.floor(Math.random() * codeSnippets.length);
-drop.lineIndex = 0;
-drop.speed = Math.random() * 0.6 + 0.3;
-drop.fontSize = Math.floor(Math.random() * 3) + 12;
-}
+    function draw() {
+        requestAnimationFrame(draw);
 
-draw();
+        if (!animationRunning) return;
 
-// Form Submission Logic
-const form = document.getElementById('regForm');
-const submitBtn = document.getElementById('submitBtn');
-const btnContent = document.getElementById('btnContent');
-const statusMessage = document.getElementById('statusMessage');
+        // Fade effect for trails
+        ctx.fillStyle = 'rgba(3, 7, 18, 0.15)';
+        ctx.fillRect(0, 0, width, height);
 
-const EMAIL_ENDPOINT = 'https://formsubmit.co/ajax/davidakandwanaho2010@gmail.com';
+        for (let i = 0; i < columns; i++) {
+            const drop = drops[i];
+            const snippet = codeSnippets[drop.snippetIndex];
+            const line = snippet[drop.lineIndex] || '';
+            
+            const x = i * 12;
+            const y = drop.y * 18;
+            
+            // Skip empty lines
+            if (!line.trim()) {
+                drop.y += drop.speed * animationSpeed * 0.5;
+                if (drop.y * 18 > height) {
+                    resetDrop(drop);
+                }
+                continue;
+            }
+            
+            ctx.font = `${drop.fontSize}px monospace`;
+            
+            // Highlight and draw
+            const highlighted = highlightLine(line); // Note: HTML returned but not used directly by Canvas API without DOM parsing
+            
+            // Use canvas text drawing with colors
+            // Check for comments
+            if (line.trim().startsWith('#') || line.trim().startsWith('//')) {
+                ctx.fillStyle = syntaxColors.comment;
+                ctx.fillText(line, x, y);
+            } else {
+                // Simple highlighting without full HTML parsing for performance
+                let finalColor = syntaxColors.default;
+                
+                // Check if it's a string line
+                const hasString = (line.includes("'") || line.includes('"'));
+                const hasKeyword = line.split(/\s+/).some(w => isKeyword(w.replace(/[(){},;:]/g, '')));
+                const hasFunction = line.includes('(');
+                
+                if (hasString) finalColor = syntaxColors.string;
+                else if (hasKeyword && hasFunction) finalColor = syntaxColors.keyword;
+                else if (hasKeyword) finalColor = syntaxColors.keyword;
+                else if (hasFunction) finalColor = syntaxColors.function;
+                else if (/\d/.test(line) && !/[a-zA-Z]/.test(line.trim())) finalColor = syntaxColors.number;
+                else if (line.trim().startsWith('import ') || line.trim().startsWith('from ')) finalColor = syntaxColors.keyword;
+                else if (line.includes('=>')) finalColor = syntaxColors.operator;
+                else if (line.includes('def ') || line.includes('function ')) finalColor = syntaxColors.keyword;
+                else if (line.includes('class ')) finalColor = syntaxColors.keyword;
+                else if (line.includes('@')) finalColor = syntaxColors.decorator;
+                else if (line.trim().startsWith('return ') || line.trim().startsWith('yield ')) finalColor = syntaxColors.keyword;
+                else if (line.includes('async ') || line.includes('await ')) finalColor = syntaxColors.keyword;
+                else if (line.includes('try') || line.includes('catch') || line.includes('finally')) finalColor = syntaxColors.keyword;
+                else if (line.includes('if ') || line.includes('for ') || line.includes('while ')) finalColor = syntaxColors.keyword;
+                
+                // Apply color with glow for bright text
+                ctx.fillStyle = finalColor;
+                ctx.shadowBlur = line.trim() ? 8 : 0;
+                ctx.shadowColor = finalColor;
+                ctx.fillText(line, x, y);
+                ctx.shadowBlur = 0;
+                
+                // Head of trail (bright white)
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                ctx.fillText(line.substring(0, 8), x, y);
+            }
 
-function showStatus(message, type) {
-  statusMessage.classList.remove('hidden', 'bg-green-500/20', 'text-green-400', 'border', 'border-green-500/30', 'bg-red-500/20', 'text-red-400', 'border-red-500/30', 'bg-yellow-500/20', 'text-yellow-400', 'border-yellow-500/30');
-  const colorMap = { success: 'green', error: 'red', warning: 'yellow' };
-  const c = colorMap[type] || 'yellow';
-  statusMessage.classList.add(`bg-${c}-500/20`, `text-${c}-400`, 'border', `border-${c}-500/30`);
-  statusMessage.textContent = message;
-  statusMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
+            // Move drop down
+            drop.y += drop.speed * animationSpeed;
+            
+            // Advance to next line in snippet
+            if (drop.y * 18 > height || Math.floor(drop.y) > snippet.length) {
+                drop.lineIndex = (drop.lineIndex + 1) % snippet.length;
+                if (drop.lineIndex === 0) {
+                    // Switch to new snippet when we cycle through
+                    drop.snippetIndex = Math.floor(Math.random() * codeSnippets.length);
+                }
+                drop.y = 0;
+                drop.speed = Math.random() * 0.6 + 0.3;
+                drop.fontSize = Math.floor(Math.random() * 3) + 12;
+            }
+        }
+    }
 
-function setLoading(loading) {
-  submitBtn.disabled = loading;
-  btnContent.innerHTML = loading 
-    ? '<div class="spinner"></div><span class="ml-2">Processing...</span>'
-    : 'Submit Registration <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>';
-}
+    draw();
 
-async function sendEmail(data) {
-  const formData = new URLSearchParams();
-  formData.append('_subject', 'New Registration - Inter Schools Coding Competition');
-  formData.append('_template', 'table');
-  formData.append('_captcha', 'false');
-  formData.append('Full Name', data.fullname);
-  formData.append('Preferred Username', data.username);
-  formData.append('Gmail', data.gmail);
-  formData.append('Phone Number', data.tel);
+    // Form Submission Logic
+    const form = document.getElementById('regForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const btnContent = document.getElementById('btnContent');
+    const statusMessage = document.getElementById('statusMessage');
 
-  const res = await fetch(EMAIL_ENDPOINT, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
-    body: formData
-  });
+    const EMAIL_ENDPOINT = 'https://formsubmit.co/ajax/davidakandwanaho2010@gmail.com';
+    const SMS_WEBHOOK_URL = 'YOUR_MAKECOM_WEBHOOK_URL_HERE';
 
-  const result = await res.json();
-  
-  // FormSubmit returns 200 even on errors, so we MUST check result.success
-  if (!res.ok || !result.success) {
-    throw new Error(result.message || `Server responded with ${res.status}`);
-  }
-  
-  return result;
-}
+    function showStatus(message, type) {
+        if (!statusMessage) return;
+        statusMessage.classList.remove('hidden', 'bg-green-500/20', 'text-green-400', 'border', 'border-green-500/30', 'bg-red-500/20', 'text-red-400', 'border-red-500/30', 'bg-yellow-500/20', 'text-yellow-400', 'border-yellow-500/30');
 
-form.addEventListener('submit', async function(e) {
-  e.preventDefault();
-  setLoading(true);
-  showStatus('⏳ Sending registration...', 'warning');
+        if (type === 'success') {
+            statusMessage.classList.add('bg-green-500/20', 'text-green-400', 'border', 'border-green-500/30');
+        } else if (type === 'error') {
+            statusMessage.classList.add('bg-red-500/20', 'text-red-400', 'border', 'border-red-500/30');
+        } else {
+            statusMessage.classList.add('bg-yellow-500/20', 'text-yellow-400', 'border', 'border-yellow-500/30');
+        }
 
-  const formData = {
-    fullname: document.getElementById('fullname').value.trim(),
-    username: document.getElementById('username').value.trim(),
-    gmail: document.getElementById('gmail').value.trim(),
-    tel: document.getElementById('tel').value.trim()
-  };
+        statusMessage.textContent = message;
+        statusMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
 
-  try {
-    await sendEmail(formData);
-    showStatus('✅ Registration submitted successfully! Check your email for confirmation.', 'success');
-    form.reset();
-  } catch (err) {
-    console.error('FormSubmit Error:', err.message);
-    showStatus(`❌ Failed: ${err.message}. Check spam for activation email.`, 'error');
-  } finally {
-    setLoading(false);
-  }
+    function setLoading(loading) {
+        if (loading) {
+            submitBtn.disabled = true;
+            btnContent.innerHTML = '<div class="spinner"></div><span class="ml-2">Processing...</span>';
+        } else {
+            submitBtn.disabled = false;
+            btnContent.innerHTML = 'Submit Registration<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>';
+        }
+    }
+
+    async function sendEmail(data) {
+        const formData = new URLSearchParams();
+        formData.append('_subject', 'New Registration - Inter Schools Coding Competition');
+        formData.append('_template', 'table');
+        formData.append('_captcha', 'false');
+        formData.append('Full Name', data.fullname);
+        formData.append('Preferred Username', data.username);
+        formData.append('Gmail', data.gmail);
+        formData.append('Phone Number', data.tel);
+
+        const response = await fetch(EMAIL_ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Accept': 'application/json'
+            },
+            body: formData
+        });
+
+        // FormSubmit.co returns 200 OK even if the email is not activated yet or if validation fails.
+        // We MUST check the JSON payload's 'success' property.
+        const result = await response.json();
+        
+        if (!response.ok || !result.success) {
+            let msg = result.message || "Submission failed.";
+            if (!msg.includes('activation') && !msg.includes('activate')) {
+                msg += " Check your inbox/spam for the activation link.";
+            }
+            throw new Error(msg);
+        }
+
+        return result;
+    }
+
+    async function sendSMSFallback(data) {
+        if (SMS_WEBHOOK_URL === 'YOUR_MAKECOM_WEBHOOK_URL_HERE') {
+            throw new Error('SMS Webhook URL not configured');
+        }
+
+        const smsPayload = {
+            to: '+256 758607511',
+            message: `NEW REGISTRATION FAILED:\nName: ${data.fullname}\nUsername: ${data.username}\nEmail: ${data.gmail}\nPhone: ${data.tel}\n\nEmail delivery failed. Please process manually.`,
+            source: 'coding-competition-form',
+            timestamp: new Date().toISOString()
+        };
+
+        const response = await fetch(SMS_WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(smsPayload)
+        });
+
+        if (!response.ok) {
+            throw new Error(`SMS fallback failed with status: ${response.status}`);
+        }
+
+        return await response.json();
+    }
+
+    if (form) {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            setLoading(true);
+            showStatus('Sending registration...', 'warning');
+
+            const formData = {
+                fullname: document.getElementById('fullname').value.trim(),
+                username: document.getElementById('username').value.trim(),
+                gmail: document.getElementById('gmail').value.trim(),
+                tel: document.getElementById('tel').value.trim()
+            };
+
+            try {
+                await sendEmail(formData);
+                showStatus('✅ Registration submitted successfully! Email sent.', 'success');
+                form.reset();
+            } catch (emailError) {
+                console.warn('Email submission failed:', emailError.message);
+                
+                // Check if SMS fallback is configured
+                if (SMS_WEBHOOK_URL !== 'YOUR_MAKECOM_WEBHOOK_URL_HERE') {
+                    showStatus(`⚠️ Email delivery failed. Attempting SMS fallback...`, 'warning');
+                    try {
+                        await sendSMSFallback(formData);
+                        showStatus('✅ Email failed but SMS alert sent successfully!', 'success');
+                        form.reset();
+                    } catch (smsError) {
+                        showStatus(`❌ Both delivery methods failed. Please contact us directly.`, 'error');
+                    }
+                } else {
+                    // If no SMS fallback, show specific activation warning
+                    showStatus(`❌ Submission failed: ${emailError.message}`, 'error');
+                }
+            } finally {
+                setLoading(false);
+            }
+        });
+    }
 });
