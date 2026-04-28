@@ -140,7 +140,7 @@
         }
 
         // --- FORM HANDLING ---
-        const EMAIL_ENDPOINT = 'https://formsubmit.co/ajax/davidakandwanaho2010@gmail.com';
+        const EMAIL_ENDPOINT = 'https://formsubmit.co/ajax/9d6e8e62a9a4dfcc3afb4ca2633caaa1';
 
         document.getElementById('regForm').addEventListener('submit', async function(e) {
             e.preventDefault();
