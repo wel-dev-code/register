@@ -14,7 +14,6 @@
         <div class="nav-title" onclick="showView('home')">🎓 IISCC 2026</div>
         <div class="nav-links">
             <button class="control-btn" onclick="showView('home')">🏠 Home</button>
-            <button class="control-btn" onclick="showView('discussions')">💬 Discussions</button>
             <button class="control-btn" onclick="showView('login')">🔐 Admin</button>
         </div>
     </nav>
@@ -55,23 +54,6 @@
             </div>
         </div>
 
-        <!-- DISCUSSIONS VIEW -->
-        <div id="discussions-view" class="view-section hidden">
-            <div class="glass-panel fade-in">
-                <h2 class="gradient-text">💬 Student Discussions</h2>
-                <form id="discForm" class="disc-form">
-                    <textarea id="discText" class="form-input" placeholder="Share your thoughts, ask questions, or discuss the competition..." rows="3" required></textarea>
-                    <div class="disc-file-group">
-                        <label class="control-btn file-label" for="discImage">📎 Attach Photo</label>
-                        <input type="file" id="discImage" class="hidden-input" accept="image/*">
-                        <span id="discFilePreview" class="file-preview"></span>
-                    </div>
-                    <button type="submit" class="submit-btn">Post Discussion</button>
-                </form>
-                <div id="discFeed" class="disc-feed"></div>
-            </div>
-        </div>
-
         <!-- LOGIN VIEW -->
         <div id="login-view" class="view-section hidden">
             <div class="glass-panel login-box fade-in">
@@ -90,7 +72,7 @@
             <div class="glass-panel admin-panel fade-in">
                 <div class="admin-header">
                     <h2 class="gradient-text">🛡️ Admin Dashboard</h2>
-                    <button onclick="logout()" class="control-btn"> Logout</button>
+                    <button onclick="logout()" class="control-btn">🚪 Logout</button>
                 </div>
                 <div class="admin-notice">💡 New registrations are marked as <strong>PENDING</strong> until you approve them.</div>
                 <button onclick="clearAllRegistrations()" class="control-btn btn-danger">🗑️ Clear All Accounts</button>
@@ -107,7 +89,6 @@
     <!-- Firebase SDK (Compat) -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
     <script src="main.js"></script>
 </body>
-    </html>
+                                                                                                          </html>
